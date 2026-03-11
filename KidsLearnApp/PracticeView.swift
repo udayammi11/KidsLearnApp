@@ -68,7 +68,8 @@ struct PracticeView: View {
                     Color(.secondarySystemBackground)
                         .onAppear { canvasSize = geometry.size }
                     
-                    let fontSize = min(geometry.size.width, geometry.size.height) * 0.6
+                    // Reduced letter size: 0.54 instead of 0.6 (10% smaller)
+                    let fontSize = min(geometry.size.width, geometry.size.height) * 0.54
                     Text(letter)
                         .font(.system(size: fontSize, weight: .heavy))
                         .foregroundColor(.gray.opacity(0.3))
@@ -401,7 +402,8 @@ struct StrokeAnalyzer {
             let context = ctx.cgContext
             context.setFillColor(UIColor.blue.withAlphaComponent(0.3).cgColor)
             
-            let fontSize = min(canvasSize.width, canvasSize.height) * 0.6
+            // Reduced letter size: 0.54 instead of 0.6
+            let fontSize = min(canvasSize.width, canvasSize.height) * 0.54
             let font = UIFont.systemFont(ofSize: fontSize, weight: .heavy)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
@@ -425,7 +427,8 @@ struct StrokeAnalyzer {
             // Clear background (transparent)
             context.clear(CGRect(origin: .zero, size: size))
             
-            let fontSize = min(size.width, size.height) * 0.6
+            // Reduced letter size: 0.54 instead of 0.6
+            let fontSize = min(size.width, size.height) * 0.54
             let font = UIFont.systemFont(ofSize: fontSize, weight: .heavy)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
