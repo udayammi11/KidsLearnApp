@@ -55,19 +55,39 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // Language header with progress and logout
+                // Welcome header with user info, progress and logout
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
+                        // Welcome message with user name
+                        HStack(spacing: 4) {
+                            Image(systemName: "hand.wave.fill")
+                                .foregroundColor(.yellow)
+                                .font(.title3)
+                            
+                            Text("Welcome,")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                            
+                            Text(appState.currentUser?.name ?? "Learner")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.blue)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
+                        
+                        // Language and progress
                         HStack(spacing: 6) {
                             Text(appState.selectedLanguage.emoji)
                                 .font(.title3)
                             Text(appState.selectedLanguage.displayName)
                                 .font(.headline)
+                                .foregroundColor(.secondary)
                         }
                         
                         ProgressView(value: progressPercentage)
                             .tint(.green)
-                            .frame(width: 90)
+                            .frame(width: 120)
                     }
                     
                     Spacer(minLength: 8)
@@ -95,7 +115,7 @@ struct HomeView: View {
                                 .clipShape(Circle())
                         }
                         
-                        // Logout button - FIXED: calls appState.logout()
+                        // Logout button
                         Button {
                             appState.logout()
                         } label: {
@@ -168,6 +188,24 @@ struct HomeView: View {
                     )
                 }
                 .padding(.horizontal)
+                
+                // Optional: Show user type (Guest or PIN protected)
+                if let user = appState.currentUser {
+                    HStack {
+                        Spacer()
+                        Label(
+                            user.isGuest ? "Guest User" : "PIN Protected",
+                            systemImage: user.isGuest ? "person" : "lock.shield"
+                        )
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                    }
+                    .padding(.horizontal)
+                }
             }
             .padding(.vertical)
         }

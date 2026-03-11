@@ -11,11 +11,12 @@ struct LoginView: View {
     @EnvironmentObject var appState: AppState
     @State private var showCreateAccount = false
     @State private var showReturning = false
+    @State private var username = ""
     @State private var pin = ""
     @State private var errorMessage = ""
     
     var body: some View {
-        VStack(spacing: 30) {
+        VStack(spacing: 25) {
             Spacer()
             
             Image(systemName: "person.circle.fill")
@@ -26,12 +27,52 @@ struct LoginView: View {
                 .font(.largeTitle.bold())
                 .multilineTextAlignment(.center)
             
-            VStack(spacing: 16) {
-                // New Learner button
+            // Login form
+            VStack(spacing: 15) {
+                TextField("Username", text: $username)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .padding(.horizontal)
+                
+                SecureField("PIN (4 digits)", text: $pin)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .keyboardType(.numberPad)
+                    .padding(.horizontal)
+                    .onChange(of: pin) { newValue in
+                        if newValue.count > 4 {
+                            pin = String(newValue.prefix(4))
+                        }
+                    }
+                
+                Button("Login") {
+                    login()
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .padding(.horizontal)
+                .disabled(username.isEmpty || pin.count != 4)
+            }
+            
+            if !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.callout)
+                    .padding(.horizontal)
+            }
+            
+            Divider()
+                .padding(.horizontal)
+            
+            // Alternative options
+            VStack(spacing: 12) {
                 Button {
                     showCreateAccount = true
                 } label: {
-                    Label("New Learner", systemImage: "plus.circle")
+                    Text("Create New Account")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.green)
@@ -39,21 +80,11 @@ struct LoginView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                 }
                 
-                // Returning Learner button
                 Button {
-                    showReturning = true
-                } label: {
-                    Label("Returning Learner", systemImage: "arrow.clockwise")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                }
-                
-                // Guest button
-                Button {
-                    appState.currentUser = User(name: "Guest", pin: nil)
+                    // Guest login
+                    _ = appState.createUser(username: "guest_\(Int.random(in: 1000...9999))",
+                                           name: "Guest",
+                                           pin: nil)
                 } label: {
                     Text("Continue as Guest")
                         .frame(maxWidth: .infinity)
@@ -65,79 +96,23 @@ struct LoginView: View {
             }
             .padding(.horizontal)
             
-            if !errorMessage.isEmpty {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .font(.callout)
-            }
-            
             Spacer()
         }
-        .padding()
+        .padding(.top, 20)
         .navigationBarBackButtonHidden(true)
         .navigationDestination(isPresented: $showCreateAccount) {
             CreateAccountView()
         }
-        .sheet(isPresented: $showReturning) {
-            ReturningLoginView(pin: $pin, errorMessage: $errorMessage) { success in
-                if success {
-                    showReturning = false
-                }
-            }
-        }
     }
-}
-
-struct ReturningLoginView: View {
-    @EnvironmentObject var appState: AppState
-    @Binding var pin: String
-    @Binding var errorMessage: String
-    var onComplete: (Bool) -> Void
-    @Environment(\.dismiss) var dismiss
     
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section("Enter your PIN") {
-                    SecureField("4-digit PIN", text: $pin)
-                        .keyboardType(.numberPad)
-                        .onChange(of: pin) { newValue in
-                            if newValue.count > 4 {
-                                pin = String(newValue.prefix(4))
-                            }
-                        }
-                }
-                
-                Section {
-                    Button("Login") {
-                        if let user = appState.currentUser {
-                            if user.validate(pin: pin) {
-                                onComplete(true)
-                                dismiss()
-                            } else {
-                                errorMessage = "Incorrect PIN"
-                            }
-                        } else {
-                            errorMessage = "No saved user. Please create an account."
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-                
-                if !errorMessage.isEmpty {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                }
-            }
-            .navigationTitle("Returning Learner")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-            }
+    private func login() {
+        if appState.login(username: username, pin: pin) {
+            // Success - navigation will happen automatically via appState
+            username = ""
+            pin = ""
+            errorMessage = ""
+        } else {
+            errorMessage = "Invalid username or PIN"
         }
     }
 }

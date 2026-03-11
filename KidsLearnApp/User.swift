@@ -5,17 +5,18 @@
 //  Created by Uday Kumar on 11/03/2026.
 //
 
-
 import Foundation
 
-struct User: Codable {
+struct User: Codable, Identifiable {
     let id: UUID
-    var name: String
-    var pinHash: String? // nil for guest
+    var username: String  // Unique identifier for login
+    var name: String       // Display name
+    var pinHash: String?   // nil for guest
     
-    init(name: String, pin: String? = nil) {
+    init(username: String, name: String, pin: String? = nil) {
         self.id = UUID()
-        self.name = name
+        self.username = username.lowercased().trimmingCharacters(in: .whitespaces)
+        self.name = name.trimmingCharacters(in: .whitespaces)
         if let pin = pin {
             // Simple hash for demo (not secure, but fine for kids app)
             self.pinHash = String(pin.hash)

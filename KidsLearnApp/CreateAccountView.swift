@@ -10,21 +10,26 @@ import SwiftUI
 struct CreateAccountView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
+    @State private var username = ""
     @State private var name = ""
     @State private var pin = ""
     @State private var confirmPin = ""
-    @State private var usePin = false
+    @State private var usePin = true
     @State private var errorMessage = ""
     
     var body: some View {
         Form {
-            Section("Learner Information") {
-                TextField("Child's Name", text: $name)
+            Section("Account Information") {
+                TextField("Username (for login)", text: $username)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                
+                TextField("Child's Name (display name)", text: $name)
                     .autocapitalization(.words)
             }
             
             Section {
-                Toggle("Use PIN for returning", isOn: $usePin.animation())
+                Toggle("Protect with PIN", isOn: $usePin.animation())
             }
             
             if usePin {
@@ -52,15 +57,16 @@ struct CreateAccountView: View {
                     createAccount()
                 }
                 .frame(maxWidth: .infinity)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                .disabled(username.isEmpty || name.isEmpty)
             }
             
             if !errorMessage.isEmpty {
                 Text(errorMessage)
                     .foregroundColor(.red)
+                    .font(.callout)
             }
         }
-        .navigationTitle("New Learner")
+        .navigationTitle("New Account")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -72,7 +78,14 @@ struct CreateAccountView: View {
     }
     
     private func createAccount() {
+        let trimmedUsername = username.lowercased().trimmingCharacters(in: .whitespaces)
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
+        
+        guard !trimmedUsername.isEmpty else {
+            errorMessage = "Please enter a username"
+            return
+        }
+        
         guard !trimmedName.isEmpty else {
             errorMessage = "Please enter a name"
             return
@@ -87,10 +100,12 @@ struct CreateAccountView: View {
                 errorMessage = "PINs do not match"
                 return
             }
-            appState.currentUser = User(name: trimmedName, pin: pin)
-        } else {
-            appState.currentUser = User(name: trimmedName, pin: nil)
         }
-        dismiss()
+        
+        if appState.createUser(username: trimmedUsername, name: trimmedName, pin: usePin ? pin : nil) {
+            dismiss()
+        } else {
+            errorMessage = "Username already exists. Please choose another."
+        }
     }
 }
