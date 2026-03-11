@@ -5,7 +5,6 @@
 //  Created by Uday Kumar on 11/03/2026.
 //
 
-
 import SwiftUI
 
 struct LoginView: View {
@@ -16,74 +15,73 @@ struct LoginView: View {
     @State private var errorMessage = ""
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 30) {
-                Spacer()
-                
-                Image(systemName: "person.circle.fill")
-                    .font(.system(size: 80))
-                    .foregroundColor(.blue)
-                
-                Text("Welcome to Kids Learn")
-                    .font(.largeTitle.bold())
-                    .multilineTextAlignment(.center)
-                
-                VStack(spacing: 16) {
-                    // New Learner button
-                    Button {
-                        showCreateAccount = true
-                    } label: {
-                        Label("New Learner", systemImage: "plus.circle")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                    }
-                    
-                    // Returning Learner button
-                    Button {
-                        showReturning = true
-                    } label: {
-                        Label("Returning Learner", systemImage: "arrow.clockwise")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                    }
-                    
-                    // Guest button
-                    Button {
-                        appState.currentUser = User(name: "Guest", pin: nil)
-                    } label: {
-                        Text("Continue as Guest")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .foregroundColor(.primary)
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                    }
-                }
-                .padding(.horizontal)
-                
-                if !errorMessage.isEmpty {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .font(.callout)
+        VStack(spacing: 30) {
+            Spacer()
+            
+            Image(systemName: "person.circle.fill")
+                .font(.system(size: 80))
+                .foregroundColor(.blue)
+            
+            Text("Welcome to Kids Learn")
+                .font(.largeTitle.bold())
+                .multilineTextAlignment(.center)
+            
+            VStack(spacing: 16) {
+                // New Learner button
+                Button {
+                    showCreateAccount = true
+                } label: {
+                    Label("New Learner", systemImage: "plus.circle")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
                 }
                 
-                Spacer()
+                // Returning Learner button
+                Button {
+                    showReturning = true
+                } label: {
+                    Label("Returning Learner", systemImage: "arrow.clockwise")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                }
+                
+                // Guest button
+                Button {
+                    appState.currentUser = User(name: "Guest", pin: nil)
+                } label: {
+                    Text("Continue as Guest")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                        .foregroundColor(.primary)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                }
             }
-            .padding()
-            .navigationDestination(isPresented: $showCreateAccount) {
-                CreateAccountView()
+            .padding(.horizontal)
+            
+            if !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.callout)
             }
-            .sheet(isPresented: $showReturning) {
-                ReturningLoginView(pin: $pin, errorMessage: $errorMessage) { success in
-                    if success {
-                        showReturning = false
-                    }
+            
+            Spacer()
+        }
+        .padding()
+        .navigationBarBackButtonHidden(true)
+        .navigationDestination(isPresented: $showCreateAccount) {
+            CreateAccountView()
+        }
+        .sheet(isPresented: $showReturning) {
+            ReturningLoginView(pin: $pin, errorMessage: $errorMessage) { success in
+                if success {
+                    showReturning = false
                 }
             }
         }
@@ -112,18 +110,14 @@ struct ReturningLoginView: View {
                 
                 Section {
                     Button("Login") {
-                        // For demo, we'll just check if there's a stored user with matching PIN
-                        // In a real app, you'd have multiple users. Here we assume one user.
                         if let user = appState.currentUser {
                             if user.validate(pin: pin) {
-                                // Success
                                 onComplete(true)
                                 dismiss()
                             } else {
                                 errorMessage = "Incorrect PIN"
                             }
                         } else {
-                            // No user, maybe redirect to create account
                             errorMessage = "No saved user. Please create an account."
                         }
                     }

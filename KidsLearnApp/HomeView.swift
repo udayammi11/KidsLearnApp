@@ -73,6 +73,7 @@ struct HomeView: View {
                     Spacer(minLength: 8)
                     
                     HStack(spacing: 12) {
+                        // Progress button
                         Button {
                             showingProgress.toggle()
                         } label: {
@@ -84,6 +85,7 @@ struct HomeView: View {
                                 .clipShape(Circle())
                         }
                         
+                        // Language change button
                         NavigationLink(destination: LanguageSelectView()) {
                             Image(systemName: "globe")
                                 .font(.title3)
@@ -93,6 +95,7 @@ struct HomeView: View {
                                 .clipShape(Circle())
                         }
                         
+                        // Logout button - FIXED: calls appState.logout()
                         Button {
                             appState.logout()
                         } label: {
@@ -148,7 +151,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(HomeCardButtonStyle())
                     
-                    // Colors Card
+                    // Colors Card (disabled)
                     HomeCard(
                         title: "Colors",
                         icon: "paintpalette.fill",
@@ -156,7 +159,7 @@ struct HomeView: View {
                         disabled: true
                     )
                     
-                    // Rhymes Card
+                    // Rhymes Card (disabled)
                     HomeCard(
                         title: "Rhymes",
                         icon: "music.note.list",

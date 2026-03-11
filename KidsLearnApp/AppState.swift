@@ -64,6 +64,5 @@ final class AppState: ObservableObject {
     
     func logout() {
         currentUser = nil
-        // Optionally reset progress or keep it? We'll keep progress for now.
     }
 }
