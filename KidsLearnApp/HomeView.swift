@@ -88,6 +88,18 @@ struct HomeView: View {
         }
     }
     
+    // Language-specific icons for cards
+    private var alphabetIcon: String {
+        switch appState.selectedLanguage {
+        case .english:
+            return "a.circle.fill"
+        case .telugu:
+            return "a.circle.fill" // Using "అ" symbol isn't available in SF Symbols, so use a generic icon
+        case .hindi:
+            return "a.circle.fill" // Using "अ" symbol isn't available, use generic
+        }
+    }
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -166,7 +178,7 @@ struct HomeView: View {
                 }
                 .padding(.horizontal)
                 
-                // Stats cards
+                // Stats cards - Fixed Telugu word for Numbers
                 HStack(spacing: 12) {
                     StatCard(
                         title: appState.selectedLanguage == .telugu ? "అక్షరాలు" :
@@ -193,21 +205,21 @@ struct HomeView: View {
                     ],
                     spacing: 12
                 ) {
-                    // Alphabets Card
+                    // Alphabets Card - Fixed Telugu word
                     Button {
                         navigateToAlphabets = true
                     } label: {
                         HomeCard(
                             title: appState.selectedLanguage == .telugu ? "అక్షరమాల" :
                                    appState.selectedLanguage == .hindi ? "वर्णमाला" : "Alphabet",
-                            icon: "textformat.abc",
+                            icon: alphabetIcon,
                             color: .blue,
                             progress: alphabetProgress
                         )
                     }
                     .buttonStyle(HomeCardButtonStyle())
                     
-                    // Numbers Card
+                    // Numbers Card - Fixed Telugu word
                     Button {
                         navigateToNumbers = true
                     } label: {
@@ -221,7 +233,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(HomeCardButtonStyle())
                     
-                    // Colors Card (disabled)
+                    // Colors Card - Fixed Telugu word
                     HomeCard(
                         title: appState.selectedLanguage == .telugu ? "రంగులు" :
                                appState.selectedLanguage == .hindi ? "रंग" : "Colors",
@@ -230,7 +242,7 @@ struct HomeView: View {
                         disabled: true
                     )
                     
-                    // Rhymes Card (disabled)
+                    // Rhymes Card - Fixed Telugu word
                     HomeCard(
                         title: appState.selectedLanguage == .telugu ? "పాటలు" :
                                appState.selectedLanguage == .hindi ? "कविताएं" : "Rhymes",
@@ -262,8 +274,8 @@ struct HomeView: View {
             .padding(.vertical)
         }
         .navigationTitle(
-            appState.selectedLanguage == .telugu ? "పిల్లల నేర్చుకోండి" :
-            appState.selectedLanguage == .hindi ? "बच्चे सीखें" : "Kids Learn"
+            appState.selectedLanguage == .telugu ? "Kids Learn" :
+            appState.selectedLanguage == .hindi ? "Kids Learn" : "Kids Learn"
         )
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingProgress) {

@@ -24,6 +24,8 @@ struct KidsLearnApp: App {
 struct SplashView: View {
     @EnvironmentObject var appState: AppState
     @State private var isActive = false
+    @State private var logoScale = 0.5
+    @State private var logoOpacity = 0.0
     
     var body: some View {
         VStack {
@@ -36,21 +38,40 @@ struct SplashView: View {
                     LanguageSelectView()
                 }
             } else {
-                VStack(spacing: 20) {
-                    Image(systemName: "abcube")
-                        .font(.system(size: 80))
-                        .foregroundColor(.blue)
+                VStack(spacing: 30) {
+                    // Use any of the logo designs here
+                    AppLogo(size: 180, animate: true)
+                        .scaleEffect(logoScale)
+                        .opacity(logoOpacity)
+                    
                     Text("Kids Learn")
                         .font(.largeTitle)
-                        .bold()
+                        .fontWeight(.bold)
+                        .foregroundColor(.blue)
+                        .opacity(logoOpacity)
+                    
+                    Text("తెలుగు • हिंदी • English")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                        .opacity(logoOpacity)
+                    
                     ProgressView()
+                        .tint(.blue)
+                        .scaleEffect(1.2)
+                        .padding(.top, 20)
+                        .opacity(logoOpacity)
                 }
-            }
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                withAnimation {
-                    isActive = true
+                .onAppear {
+                    withAnimation(.easeOut(duration: 1.0)) {
+                        logoScale = 1.0
+                        logoOpacity = 1.0
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        withAnimation {
+                            isActive = true
+                        }
+                    }
                 }
             }
         }
