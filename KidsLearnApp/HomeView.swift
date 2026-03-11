@@ -52,6 +52,42 @@ struct HomeView: View {
     @State private var navigateToAlphabets = false
     @State private var navigateToNumbers = false
     
+    // Language-specific welcome messages
+    private var welcomeMessage: String {
+        switch appState.selectedLanguage {
+        case .english:
+            return "Welcome"
+        case .telugu:
+            return "స్వాగతం"
+        case .hindi:
+            return "स्वागत है"
+        }
+    }
+    
+    // Language-specific "Guest" text
+    private var guestText: String {
+        switch appState.selectedLanguage {
+        case .english:
+            return "Guest User"
+        case .telugu:
+            return "అతిథి వినియోగదారు"
+        case .hindi:
+            return "अतिथि उपयोगकर्ता"
+        }
+    }
+    
+    // Language-specific "PIN Protected" text
+    private var pinProtectedText: String {
+        switch appState.selectedLanguage {
+        case .english:
+            return "PIN Protected"
+        case .telugu:
+            return "PIN రక్షిత"
+        case .hindi:
+            return "PIN संरक्षित"
+        }
+    }
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -64,7 +100,7 @@ struct HomeView: View {
                                 .foregroundColor(.yellow)
                                 .font(.title3)
                             
-                            Text("Welcome,")
+                            Text("\(welcomeMessage),")
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                             
@@ -132,8 +168,20 @@ struct HomeView: View {
                 
                 // Stats cards
                 HStack(spacing: 12) {
-                    StatCard(title: "Letters", count: completedLetters, total: totalLetters, icon: "textformat.abc")
-                    StatCard(title: "Numbers", count: completedNumbers, total: totalNumbers, icon: "123.rectangle")
+                    StatCard(
+                        title: appState.selectedLanguage == .telugu ? "అక్షరాలు" :
+                               appState.selectedLanguage == .hindi ? "अक्षर" : "Letters",
+                        count: completedLetters,
+                        total: totalLetters,
+                        icon: "textformat.abc"
+                    )
+                    StatCard(
+                        title: appState.selectedLanguage == .telugu ? "సంఖ్యలు" :
+                               appState.selectedLanguage == .hindi ? "संख्या" : "Numbers",
+                        count: completedNumbers,
+                        total: totalNumbers,
+                        icon: "123.rectangle"
+                    )
                 }
                 .padding(.horizontal)
                 
@@ -150,7 +198,8 @@ struct HomeView: View {
                         navigateToAlphabets = true
                     } label: {
                         HomeCard(
-                            title: "Alphabet",
+                            title: appState.selectedLanguage == .telugu ? "అక్షరమాల" :
+                                   appState.selectedLanguage == .hindi ? "वर्णमाला" : "Alphabet",
                             icon: "textformat.abc",
                             color: .blue,
                             progress: alphabetProgress
@@ -163,7 +212,8 @@ struct HomeView: View {
                         navigateToNumbers = true
                     } label: {
                         HomeCard(
-                            title: "Numbers",
+                            title: appState.selectedLanguage == .telugu ? "సంఖ్యలు" :
+                                   appState.selectedLanguage == .hindi ? "संख्या" : "Numbers",
                             icon: "123.rectangle",
                             color: .green,
                             progress: numbersProgress
@@ -173,7 +223,8 @@ struct HomeView: View {
                     
                     // Colors Card (disabled)
                     HomeCard(
-                        title: "Colors",
+                        title: appState.selectedLanguage == .telugu ? "రంగులు" :
+                               appState.selectedLanguage == .hindi ? "रंग" : "Colors",
                         icon: "paintpalette.fill",
                         color: .orange,
                         disabled: true
@@ -181,7 +232,8 @@ struct HomeView: View {
                     
                     // Rhymes Card (disabled)
                     HomeCard(
-                        title: "Rhymes",
+                        title: appState.selectedLanguage == .telugu ? "పాటలు" :
+                               appState.selectedLanguage == .hindi ? "कविताएं" : "Rhymes",
                         icon: "music.note.list",
                         color: .purple,
                         disabled: true
@@ -189,12 +241,12 @@ struct HomeView: View {
                 }
                 .padding(.horizontal)
                 
-                // Optional: Show user type (Guest or PIN protected)
+                // User type indicator
                 if let user = appState.currentUser {
                     HStack {
                         Spacer()
                         Label(
-                            user.isGuest ? "Guest User" : "PIN Protected",
+                            user.isGuest ? guestText : pinProtectedText,
                             systemImage: user.isGuest ? "person" : "lock.shield"
                         )
                         .font(.caption2)
@@ -209,7 +261,10 @@ struct HomeView: View {
             }
             .padding(.vertical)
         }
-        .navigationTitle("Kids Learn")
+        .navigationTitle(
+            appState.selectedLanguage == .telugu ? "పిల్లల నేర్చుకోండి" :
+            appState.selectedLanguage == .hindi ? "बच्चे सीखें" : "Kids Learn"
+        )
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingProgress) {
             ProgressStatsView()
