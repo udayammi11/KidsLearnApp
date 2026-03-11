@@ -8,35 +8,62 @@
 import Foundation
 import Combine
 
-/// Global app state for language selection and progress tracking.
-/// Persists the selected language in UserDefaults.
 final class AppState: ObservableObject {
     
-    /// The currently selected app language.
     @Published var selectedLanguage: AppLanguage {
         didSet { saveLanguage() }
     }
     
-    /// Progress tracking for completed letters and scores
+    @Published var currentUser: User? {
+        didSet { saveUser() }
+    }
+    
     @Published var progress = ProgressManager()
     
-    // MARK: - Init
+    private let userDefaults = UserDefaults.standard
+    private let languageKey = "selectedLanguage"
+    private let userKey = "currentUser"
+    
     init() {
         self.selectedLanguage = Self.loadLanguage()
+        self.currentUser = Self.loadUser()
+    }
+    
+    var isLoggedIn: Bool {
+        currentUser != nil
     }
     
     // MARK: - Persistence
     private func saveLanguage() {
-        UserDefaults.standard.set(selectedLanguage.rawValue, forKey: Self.udKey)
+        userDefaults.set(selectedLanguage.rawValue, forKey: languageKey)
     }
     
     private static func loadLanguage() -> AppLanguage {
-        if let raw = UserDefaults.standard.string(forKey: Self.udKey),
+        if let raw = UserDefaults.standard.string(forKey: "selectedLanguage"),
            let lang = AppLanguage(rawValue: raw) {
             return lang
         }
         return .english
     }
     
-    private static let udKey = "selectedLanguage"
+    private func saveUser() {
+        if let user = currentUser, let data = try? JSONEncoder().encode(user) {
+            userDefaults.set(data, forKey: userKey)
+        } else {
+            userDefaults.removeObject(forKey: userKey)
+        }
+    }
+    
+    private static func loadUser() -> User? {
+        guard let data = UserDefaults.standard.data(forKey: "currentUser"),
+              let user = try? JSONDecoder().decode(User.self, from: data) else {
+            return nil
+        }
+        return user
+    }
+    
+    func logout() {
+        currentUser = nil
+        // Optionally reset progress or keep it? We'll keep progress for now.
+    }
 }

@@ -28,7 +28,9 @@ struct SplashView: View {
     var body: some View {
         VStack {
             if isActive {
-                if appState.selectedLanguage == .english {
+                if appState.currentUser == nil {
+                    LoginView()
+                } else if appState.selectedLanguage == .english {
                     HomeView()
                 } else {
                     LanguageSelectView()

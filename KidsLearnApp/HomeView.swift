@@ -14,10 +14,11 @@ struct StatCard: View {
     let icon: String
     
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title2)
                 .foregroundColor(.blue)
+                .frame(width: 30)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -28,18 +29,19 @@ struct StatCard: View {
                     .bold()
             }
             
-            Spacer()
+            Spacer(minLength: 0)
         }
-        .padding()
+        .padding(.vertical, 12)
+        .padding(.horizontal, 12)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 
 struct HomeCardButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
@@ -52,39 +54,55 @@ struct HomeView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 18) {
-                // Language header with progress
+            VStack(spacing: 16) {
+                // Language header with progress and logout
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        HStack {
+                        HStack(spacing: 6) {
                             Text(appState.selectedLanguage.emoji)
-                                .font(.title2)
+                                .font(.title3)
                             Text(appState.selectedLanguage.displayName)
                                 .font(.headline)
                         }
                         
                         ProgressView(value: progressPercentage)
                             .tint(.green)
-                            .frame(width: 100)
+                            .frame(width: 90)
                     }
                     
-                    Spacer()
+                    Spacer(minLength: 8)
                     
-                    Button {
-                        showingProgress.toggle()
-                    } label: {
-                        Image(systemName: "chart.bar.fill")
-                            .font(.title2)
-                            .foregroundColor(.blue)
-                    }
-                    
-                    NavigationLink(destination: LanguageSelectView()) {
-                        Label("Change", systemImage: "globe")
-                            .font(.subheadline)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Capsule())
+                    HStack(spacing: 12) {
+                        Button {
+                            showingProgress.toggle()
+                        } label: {
+                            Image(systemName: "chart.bar.fill")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 36, height: 36)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                        
+                        NavigationLink(destination: LanguageSelectView()) {
+                            Image(systemName: "globe")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 36, height: 36)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                        
+                        Button {
+                            appState.logout()
+                        } label: {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .font(.title3)
+                                .foregroundColor(.red)
+                                .frame(width: 36, height: 36)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -97,14 +115,19 @@ struct HomeView: View {
                 .padding(.horizontal)
                 
                 // Cards grid
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)], spacing: 16) {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.flexible(), spacing: 12)
+                    ],
+                    spacing: 12
+                ) {
                     // Alphabets Card
                     Button {
-                        print("✅ Alphabets card tapped")
                         navigateToAlphabets = true
                     } label: {
                         HomeCard(
-                            title: "Alphabets",
+                            title: "Alphabet",
                             icon: "textformat.abc",
                             color: .blue,
                             progress: alphabetProgress
@@ -114,7 +137,6 @@ struct HomeView: View {
                     
                     // Numbers Card
                     Button {
-                        print("✅ Numbers card tapped")
                         navigateToNumbers = true
                     } label: {
                         HomeCard(
@@ -126,6 +148,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(HomeCardButtonStyle())
                     
+                    // Colors Card
                     HomeCard(
                         title: "Colors",
                         icon: "paintpalette.fill",
@@ -133,6 +156,7 @@ struct HomeView: View {
                         disabled: true
                     )
                     
+                    // Rhymes Card
                     HomeCard(
                         title: "Rhymes",
                         icon: "music.note.list",
@@ -140,8 +164,9 @@ struct HomeView: View {
                         disabled: true
                     )
                 }
-                .padding()
+                .padding(.horizontal)
             }
+            .padding(.vertical)
         }
         .navigationTitle("Kids Learn")
         .navigationBarTitleDisplayMode(.inline)

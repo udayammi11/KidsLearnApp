@@ -16,37 +16,52 @@ struct HomeCard: View {
     
     var body: some View {
         VStack(spacing: 12) {
+            // Icon with progress circle
             ZStack {
                 Image(systemName: icon)
-                    .font(.system(size: 44, weight: .semibold))
+                    .font(.system(size: 40, weight: .semibold))
                     .foregroundColor(.white)
+                    .frame(height: 50)
                 
                 if let progress = progress, !disabled {
                     Circle()
                         .trim(from: 0, to: progress)
                         .stroke(Color.white, lineWidth: 3)
-                        .frame(width: 60, height: 60)
+                        .frame(width: 50, height: 50)
                         .rotationEffect(.degrees(-90))
                         .opacity(0.7)
                 }
             }
+            .padding(.top, 8)
             
+            // Title with proper wrapping and alignment
             Text(title)
                 .font(.headline)
+                .fontWeight(.semibold)
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 4)
             
             if disabled {
                 Text("Coming Soon")
                     .font(.caption2)
-                    .foregroundColor(.white.opacity(0.8))
-                    .padding(.horizontal, 8)
+                    .fontWeight(.medium)
+                    .foregroundColor(.white.opacity(0.9))
+                    .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(.ultraThinMaterial)
+                    .background(Color.black.opacity(0.3))
                     .clipShape(Capsule())
+                    .padding(.bottom, 8)
+            } else {
+                // Invisible spacer for consistent height
+                Color.clear
+                    .frame(height: 24)
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 170)
+        .frame(maxWidth: .infinity, minHeight: 160)
         .background(
             Group {
                 if disabled {
@@ -60,12 +75,12 @@ struct HomeCard: View {
                 }
             }
         )
-        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay(
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.white.opacity(0.2), lineWidth: 1)
         )
-        .shadow(color: (disabled ? .clear : color.opacity(0.4)), radius: 12, x: 0, y: 6)
+        .shadow(color: (disabled ? .clear : color.opacity(0.3)), radius: 8, x: 0, y: 4)
         .opacity(disabled ? 0.7 : 1.0)
     }
 }
