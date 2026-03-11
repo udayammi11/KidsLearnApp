@@ -2,23 +2,57 @@
 //  Models.swift
 //  KidsLearnApp
 //
-//  Created by Uday Kumar on 10/03/2026.
+//  Created by Uday Kumar on 11/03/2026.
 //
 
 import Foundation
 
 struct LetterItem: Identifiable, Hashable {
     let id = UUID()
-    let symbol: String      // e.g., "A", "అ", "अ"
-    let exampleWord: String // e.g., "Apple", "అమ్మ", "अनार"
-    let exampleEmoji: String // quick placeholder instead of images
-    let audioName: String?  // optional: "en_A", "te_అ", etc.
+    let symbol: String
+    let exampleWord: String
+    let exampleEmoji: String
+    let gifName: String?  // New: GIF name
+    let audioName: String?
+    
+    init(symbol: String, exampleWord: String, exampleEmoji: String, gifName: String? = nil, audioName: String?) {
+        self.symbol = symbol
+        self.exampleWord = exampleWord
+        self.exampleEmoji = exampleEmoji
+        self.gifName = gifName
+        self.audioName = audioName
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: LetterItem, rhs: LetterItem) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 struct NumberItem: Identifiable, Hashable {
     let id = UUID()
     let number: Int
-    let display: String     // e.g., "1", "౧", "१"
-    let word: String        // e.g., "One", "ఒకటి", "एक"
-    let audioName: String?  // optional
+    let display: String
+    let word: String
+    let gifName: String?  // New: GIF name
+    let audioName: String?
+    
+    init(number: Int, display: String, word: String, gifName: String? = nil, audioName: String?) {
+        self.number = number
+        self.display = display
+        self.word = word
+        self.gifName = gifName
+        self.audioName = audioName
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: NumberItem, rhs: NumberItem) -> Bool {
+        lhs.id == rhs.id
+    }
 }

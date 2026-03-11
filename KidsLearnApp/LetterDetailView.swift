@@ -2,7 +2,7 @@
 //  LetterDetailView.swift
 //  KidsLearnApp
 //
-//  Created by Uday Kumar on 10/03/2026.
+//  Created by Uday Kumar on 11/03/2026.
 //
 
 import SwiftUI
@@ -18,6 +18,26 @@ struct LetterDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                // Animated GIF or Emoji
+                if let gifName = item.gifName {
+                    GIFView(gifName: gifName, width: 150, height: 150, shouldLoop: true)
+                        .padding(.top)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(.secondarySystemBackground))
+                                .frame(width: 160, height: 160)
+                        )
+                } else {
+                    Text(item.exampleEmoji)
+                        .font(.system(size: 100))
+                        .padding(.top)
+                        .frame(width: 150, height: 150)
+                        .background(
+                            Circle()
+                                .fill(Color(.secondarySystemBackground))
+                        )
+                }
+                
                 // Letter card
                 VStack(spacing: 12) {
                     Text(item.symbol)
@@ -25,15 +45,9 @@ struct LetterDetailView: View {
                         .scaleEffect(animateCard ? 1 : 0.5)
                         .opacity(animateCard ? 1 : 0)
                     
-                    HStack(spacing: 20) {
-                        Text(item.exampleEmoji)
-                            .font(.system(size: 60))
-                        
-                        Text(item.exampleWord)
-                            .font(.system(size: 30, weight: .semibold))
-                    }
-                    .offset(y: animateCard ? 0 : 50)
-                    .opacity(animateCard ? 1 : 0)
+                    Text(item.exampleWord)
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 30)
@@ -88,7 +102,7 @@ struct LetterDetailView: View {
                     .padding(.top)
                 }
                 
-                // Previous score if any
+                // Previous score
                 let score = appState.progress.getScore(for: item.symbol)
                 if score > 0 {
                     HStack {
@@ -108,6 +122,7 @@ struct LetterDetailView: View {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 40))
                                 .foregroundColor(.yellow)
+                                .symbolEffect(.bounce, value: score)
                         }
                     }
                     .padding()
@@ -122,6 +137,11 @@ struct LetterDetailView: View {
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                 animateCard = true
+            }
+            
+            // Preload GIF
+            if let gifName = item.gifName {
+                GIFPreloader.shared.preloadGIF(named: gifName)
             }
         }
     }

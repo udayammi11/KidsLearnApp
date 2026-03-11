@@ -2,12 +2,11 @@
 //  AlphabetView.swift
 //  KidsLearnApp
 //
-//  Created by Uday Kumar on 10/03/2026.
+//  Created by Uday Kumar on 11/03/2026.
 //
 
 import SwiftUI
 
-// Move AlphabetCard outside AlphabetView
 struct AlphabetCard: View {
     let item: LetterItem
     let score: Int
@@ -24,33 +23,40 @@ struct AlphabetCard: View {
     var body: some View {
         VStack(spacing: 8) {
             ZStack {
+                // Animated GIF or Emoji
+                if let gifName = item.gifName {
+                    GIFView(gifName: gifName, width: 60, height: 60, shouldLoop: true)
+                        .clipShape(Circle())
+                } else {
+                    Text(item.exampleEmoji)
+                        .font(.system(size: 40))
+                }
+                
+                // Letter overlay
                 Text(item.symbol)
                     .font(.system(size: 42, weight: .bold))
-                
-                if score > 0 {
-                    VStack {
-                        HStack {
-                            Spacer()
-                            Text("\(score)%")
-                                .font(.caption2)
-                                .bold()
-                                .padding(4)
-                                .background(scoreColor)
-                                .foregroundColor(.white)
-                                .clipShape(Capsule())
-                        }
-                        Spacer()
-                    }
-                }
+                    .foregroundColor(.primary.opacity(0.2))
             }
+            .frame(height: 70)
             
-            Text(item.exampleEmoji)
-                .font(.system(size: 28))
-            
-            if score >= 80 {
-                Image(systemName: "checkmark.seal.fill")
-                    .foregroundColor(.green)
-                    .font(.caption)
+            // Score badge
+            if score > 0 {
+                Text("\(score)%")
+                    .font(.caption2)
+                    .bold()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(scoreColor)
+                    .foregroundColor(.white)
+                    .clipShape(Capsule())
+            } else {
+                Text("New")
+                    .font(.caption2)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.gray.opacity(0.2))
+                    .foregroundColor(.gray)
+                    .clipShape(Capsule())
             }
         }
         .frame(maxWidth: .infinity, minHeight: 120)
@@ -63,6 +69,12 @@ struct AlphabetCard: View {
                 )
         )
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .onAppear {
+            // Preload GIF for better performance
+            if let gifName = item.gifName {
+                GIFPreloader.shared.preloadGIF(named: gifName)
+            }
+        }
     }
 }
 
